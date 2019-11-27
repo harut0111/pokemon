@@ -17,6 +17,7 @@
   color: white;
 }
 
-.App-link {
-  color: #09d3ac;
+.my-button {
+  border: 1px solid blue;
+  background-color: #fff;
 }
