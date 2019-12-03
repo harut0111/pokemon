@@ -1,14 +1,12 @@
-import React from 'react'
+import React, {useCallback} from 'react'
 import User from '../interfaces/User.interface'
 import SearchState from '../interfaces/Search.state'
 
 
 const PokemonSearch = (props: User) => {
 
-    const pokemonRef = React.useRef<HTMLInputElement>(null);
+    const [searchValue, setSearchValue] = React.useState('1');
    
-    
-    
     const initial = {
         error: false,
         name: '',
@@ -19,13 +17,12 @@ const PokemonSearch = (props: User) => {
 
     const [searchState, setSearchState] = React.useState<SearchState>(initial)
     
-    async function onSearchClick() {
+    async function fetchPokemon() {
 
-        const inputValue = pokemonRef.current.value;
-        
-        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${inputValue}`)
+        // const inputValue = pokemonRef.current.value;
+        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${searchValue}`)
        
-        if(response.status === 200 && inputValue) {
+        if(response.status === 200 && searchValue) {
 
             const data = await response.json();
             setSearchState({
@@ -40,24 +37,28 @@ const PokemonSearch = (props: User) => {
         }        
     }
 
-    console.log(searchState);
+    const memorizedFetchPokemon = useCallback(fetchPokemon, []);
+
+    React.useMemo(() => {
+        memorizedFetchPokemon();
+    },[memorizedFetchPokemon])
 
     const { name, numberOfPokemons } = props;
 
     return (
         <div>
             <p>User {name} has {numberOfPokemons} pokemons</p>
-            {searchState.error ? <p>Pokemon not found, please try again</p> : (
+            {searchState.error ? <p style={{color: 'red'}}>Pokemon not found, please try again</p> : (
                 <div>
-                    <img src={searchState.imageUrl} alt="pokemon" className="pokemon-image" />
+                    <img src={searchState.imageUrl} alt="pokemon" className="pokemon-image" width='100' />
                     <p>
                         {searchState.name} has {searchState.numberOfAbilites} abilities and {searchState.baseExperience}{' '}
                          base experience points
                     </p>
                 </div>
             )}
-            <input type='text' ref={pokemonRef} />
-            <button onClick={onSearchClick} className='my-button'>
+            <input type='text' onChange={e => setSearchValue(e.target.value)} />
+            <button onClick={() => fetchPokemon()} className='my-button'>
                 Search
             </button>
         </div>
