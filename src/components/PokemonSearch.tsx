@@ -23,7 +23,6 @@ const PokemonSearch = (props: User) => {
       // simulate delay
       await new Promise((res) => setTimeout(() => res(null), 1000));
       const data = await Api.getPokemon(searchValue);
-      console.log(`data`, data);
       setSearchState({
         error: false,
         name: data.name,
